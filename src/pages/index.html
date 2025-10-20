@@ -62,7 +62,7 @@
 
       <div class="center">
         <button id="payBtn" class="pay-btn" type="button" onclick="startPayment()">
-          <span id="btnText">Pay KSh 1</span>
+          <span id="btnText">Pay KSh 599</span>
         </button>
       </div>
 
@@ -89,7 +89,7 @@
 
     if(!reg || !phone || !email){ alert('Registration ID, phone, and email are required'); return; }
 
-    const payload = { registration_id: reg, phone: phone, referral_code: referral, amount: 1, email: email };
+    const payload = { registration_id: reg, phone: phone, referral_code: referral, amount: 599, email: email };
 
     // UI: show loading
     document.getElementById('payBtn').disabled = true;

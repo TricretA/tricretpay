@@ -117,7 +117,8 @@ app.post('/api/stkpush', async (req, res) => {
 
 
   try {
-    const { registration_id, phone, referral_code, amount, email, referral_code_entered } = req.body;
+    const { registration_id, phone, referral_code, email, referral_code_entered } = req.body;
+    const amount = 599; // Hardcode amount to 599
 
     if(!registration_id || !phone || !email) {
       // console.error('Validation error: registration_id, phone, or email missing.');
