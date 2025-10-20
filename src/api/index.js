@@ -117,7 +117,7 @@ app.post('/api/stkpush', async (req, res) => {
 
 
   try {
-    const { registration_id, phone, referral_code, amount, email } = req.body;
+    const { registration_id, phone, referral_code, amount, email, referral_code_entered } = req.body;
 
     if(!registration_id || !phone || !email) {
       // console.error('Validation error: registration_id, phone, or email missing.');
@@ -170,7 +170,7 @@ app.post('/api/stkpush', async (req, res) => {
       return res.status(500).json(j);
     }
     const checkoutRequestID = j.CheckoutRequestID || j.checkoutRequestID || j.ResponseDescription || ('ck_' + Date.now());
-    payments[checkoutRequestID] = { status: 'PENDING', registration_id, phone, referral_code, amount: payload.Amount, email };
+    payments[checkoutRequestID] = { status: 'PENDING', registration_id, phone, referral_code, amount: payload.Amount, email, referral_code_entered };
 
 
     return res.json({ message:'STK Push initiated', CheckoutRequestID: checkoutRequestID, raw: j });
@@ -234,7 +234,8 @@ app.post('/api/callback', async (req, res) => {
             amount_paid: payments[checkoutRequestID].amount,
             mpesa_code: mpesaReceipt,
             transaction_timestamp: new Date().toISOString(),
-            referral_code: generatedReferralCode
+            referral_code: generatedReferralCode,
+            referral_code_entered: payments[checkoutRequestID].referral_code_entered || null
           };
 
           try {
