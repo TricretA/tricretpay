@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pay — TriCre8 Bootcamp</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --midnight:#191970;
+      --rich:#202A44;
+      --whatsapp:#25D366;
+      --ui:white;
+    }
+    *{box-sizing:border-box;font-family:'Poppins',sans-serif}
+    body{margin:0;background:linear-gradient(180deg,var(--midnight),var(--rich));color:var(--ui);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+    .card{width:100%;max-width:560px;background:rgba(255,255,255,0.04);backdrop-filter:blur(6px);border-radius:12px;padding:22px;border:1px solid rgba(255,255,255,0.06)}
+    h1{margin:0 0 10px;font-size:20px}
+    p{margin:0 0 14px;color:rgba(244,244,244,0.9)}
+    label{display:block;font-size:13px;margin-bottom:6px;color:rgba(244,244,244,0.95)}
+    input,select{width:100%;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:var(--ui);outline:none;transition:all .15s}
+    input:focus,select:focus{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,0.35)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .pay-btn{display:inline-block;margin-top:16px;padding:14px 18px;border-radius:10px;background:linear-gradient(90deg,var(--whatsapp),#16b84c);color:#072; font-weight:700;border:none;cursor:pointer;box-shadow:0 10px 30px rgba(37,211,102,0.14);transition:transform .15s,box-shadow .15s;animation:btnPulse 2.2s infinite}
+    .pay-btn:active{transform:translateY(2px)}
+    @keyframes btnPulse{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
+    .muted{font-size:13px;color:rgba(244,244,244,0.75);margin-top:8px}
+    .center{text-align:center}
+    .hidden{display:none}
+    .spinner{width:18px;height:18px;border-radius:50%;border:3px solid rgba(255,255,255,0.15);border-top-color:var(--ui);display:inline-block;vertical-align:middle;animation:spin 1s linear infinite;margin-right:8px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .success-badge{display:inline-block;background:rgba(255,255,255,0.06);color:var(--ui);padding:8px 12px;border-radius:999px;font-weight:600}
+    footer{margin-top:14px;text-align:center;color:rgba(244,244,244,0.6);font-size:13px}
+  </style>
+</head>
+<body>
+  <div class="card" role="main">
+    <center><img src="/assets/logo.svg" alt="TriCre8" width="78" style="display:block;margin-bottom:12px"></center>
+    <h1><center>Complete Your 5-Day Design Registration</center></h1>
+    <p><center>You are among the first 20 to join the Bootcamp. Pay now and reserve a seat.</center></p>
+
+    <form id="payForm" onsubmit="return false;">
+      <label for="email">Email</label>
+      <input id="email" name="email" placeholder="you@gmail.com" required>
+
+      <div style="height:12px"></div>
+
+      <label for="registration_id">Registration ID</label>
+      <input id="registration_id" name="registration_id" placeholder="GD2025-XXXX" required>
+
+      <div style="height:12px"></div>
+
+      <label for="phone">Phone number (M-Pesa)</label>
+      <input id="phone" name="phone" placeholder="+2547XXXXXXXX" required pattern="^(\+254|0)\d{9,12}$">
+
+      <div style="height:12px"></div>
+
+      <label for="referral">Referral code (optional)</label>
+      <input id="referral" name="referral" placeholder="REF123">
+
+      <div style="height:10px"></div>
+
+      <div class="center">
+        <button id="payBtn" class="pay-btn" type="button" onclick="startPayment()">
+          <span id="btnText">Pay KSh 599</span>
+        </button>
+      </div>
+
+      <p class="muted center">You will receive an M-Pesa payment prompt on your phone. Confirm to complete payment.</p>
+    </form>
+
+    <div id="statusBox" class="hidden">
+      <p class="center"><span class="spinner"></span>Waiting for payment confirmation... </p>
+      <p class="muted center">If you didn't receive a prompt, check your phone number and try again.</p>
+    </div>
+
+    <footer>
+      <div>TriCre8 • Graphic Design Bootcamp</div>
+    </footer>
+  </div>
+
+<script>
+  const API_BASE = 'https://unmendable-reediest-annabella.ngrok-free.dev'; // if backend on same origin, keep empty. Otherwise 'https://your-backend.com'
+  async function startPayment(){
+    const reg = document.getElementById('registration_id').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const referral = document.getElementById('referral').value.trim();
+    const email = document.getElementById('email').value.trim();
+
+    if(!reg || !phone || !email){ alert('Registration ID, phone, and email are required'); return; }
+
+    const payload = { registration_id: reg, phone: phone, referral_code: referral, amount: 599, email: email };
+
+    // UI: show loading
+    document.getElementById('payBtn').disabled = true;
+    document.getElementById('btnText').innerHTML = '<span class="spinner"></span> Processing...';
+
+    try {
+      const res = await fetch(API_BASE + '/api/stkpush', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if(!res.ok) throw new Error(data.message || 'Failed to initiate');
+      // data should contain checkoutRequestID
+      const cid = data.CheckoutRequestID || data.checkoutRequestID;
+      // show status box and poll for status
+      document.getElementById('statusBox').classList.remove('hidden');
+      pollStatus(cid, reg);
+    } catch (err) {
+      alert('Payment error: ' + (err.message || err));
+      document.getElementById('payBtn').disabled = false;
+      document.getElementById('btnText').textContent = 'Pay KSh 599';
+    }
+  }
+
+  function pollStatus(checkoutRequestID, registration_id){
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch('/api/status?checkoutRequestID=' + encodeURIComponent(checkoutRequestID));
+        const data = await res.json();
+        if(data.status === 'SUCCESS'){
+          clearInterval(interval);
+          // redirect to success page
+          window.location.href = '/src/pages/success.html?registration_id=' + encodeURIComponent(registration_id);
+          return;
+        } else if(data.status === 'FAILED' || data.status === 'CANCELLED') {
+          clearInterval(interval);
+          alert('Payment failed or cancelled. Please try again.');
+          document.getElementById('payBtn').disabled = false;
+          document.getElementById('btnText').textContent = 'Pay KSh 599';
+        }
+        // otherwise keep polling
+      } catch (e) {
+        console.error('status poll error', e);
+      }
+    }, 3500);
+    // stop polling after 3 minutes
+    setTimeout(()=>{ clearInterval(interval); }, 1000*60*3);
+  }
+</script>
+</body>
+</html>
