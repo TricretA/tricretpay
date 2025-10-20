@@ -35,7 +35,7 @@
 </head>
 <body>
   <div class="card" role="main">
-    <center><img src="/assets/logo.svg" alt="TriCre8" width="78" style="display:block;margin-bottom:12px"></center>
+    <center><h2 style="color: brown;">TricretPay</h2></center>
     <h1><center>Complete Your 5-Day Design Registration</center></h1>
     <p><center>You are among the first 20 to join the Bootcamp. Pay now and reserve a seat.</center></p>
 
@@ -123,7 +123,7 @@
         if(data.status === 'SUCCESS'){
           clearInterval(interval);
           // redirect to success page
-          window.location.href = '/src/pages/success.html?registration_id=' + encodeURIComponent(registration_id);
+          window.location.href = '/success.html?registration_id=' + encodeURIComponent(registration_id);
           return;
         } else if(data.status === 'FAILED' || data.status === 'CANCELLED') {
           clearInterval(interval);
@@ -133,7 +133,7 @@
         }
         // otherwise keep polling
       } catch (e) {
-        console.error('status poll error', e);
+        // console.error('status poll error', e);
       }
     }, 3500);
     // stop polling after 3 minutes
