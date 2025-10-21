@@ -1,14 +1,9 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "dist/api/index.js",
-      "use": "@vercel/node"
-    }
-  ],
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
   "rewrites": [
-      { "source": "/api/(.*)", "destination": "/api/$1" },
-      { "source": "/assets/(.*)", "destination": "/public/assets/$1" },
-      { "source": "/(.*)", "destination": "/pages/$1" }
-    ]
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/assets/(.*)", "destination": "/public/assets/$1" },
+    { "source": "/(.*)", "destination": "/pages/$1" }
+  ]
 }
