@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/api/index.js",
-    "build": "powershell -Command \"mkdir dist/api; mkdir dist/pages; mkdir dist/public/assets; Copy-Item src/api/index.js dist/api/index.js; Copy-Item src/pages/index.html dist/pages/index.html; Copy-Item src/pages/success.html dist/pages/success.html; Copy-Item -Recurse public/assets/* dist/public/assets\""
+    "build": "mkdir -p dist/api dist/pages dist/public/assets && cp src/api/index.js dist/api/index.js && cp src/pages/index.html dist/pages/index.html && cp src/pages/success.html dist/pages/success.html && cp -r public/assets/* dist/public/assets"
   },
   "keywords": [],
   "author": "",
